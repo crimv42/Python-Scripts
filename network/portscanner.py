@@ -36,16 +36,27 @@ def time_spent(x, time=datetime.now()):
         total = time_2 - time
         return total
 
+def get_port_range():
+    start_port = int(input("Starting port: "))
+    end_port = int(input("Ending port: "))
+    port_range = (start_port, (end_port + 1))
+    return port_range
 
 def port_scan(remote_server_ip):
+    port_range = get_port_range()
     try:
-        for port in range(1,25):
+        print ("\n {0:1s}: {1:>9}:".format('Port', 'Status'))
+        for port in range(port_range[0], port_range[1]):
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(5)
             result = sock.connect_ex((remote_server_ip, port))
             if result == 0:
-                print ("Port {}:    Open".format(port))
+                print (" {0:< 5d} {1:>10}".format(port, 'Open'))
+            else:
+                print (" {0:< 5d} {1:>10}".format(port, 'Closed'))
             sock.close()
         return ("\nScan Completed!\n")
+    
     except KeyboardInterrupt:
         print ("\nYou pressed Ctrl+C")
         sys.exit()

@@ -6,7 +6,7 @@ import argparse
 from datetime import datetime
 from time import sleep
 
-# Ask for input
+# Ask for the Hostname from the user
 def get_host():
     remote_server = input("Enter a remote hostname to scan: ")
     try:
@@ -22,6 +22,7 @@ def banner(remote_server_ip):
                 % remote_server_ip + "-" * 60)
     return message
 
+## Timer to see how long it took to run the scan
 def time_spent(x, time=datetime.now()):
     x.lower()
     if x == 'start':
@@ -31,12 +32,14 @@ def time_spent(x, time=datetime.now()):
         total = time_2 - time
         return total
 
+## Get the port Range from the user
 def get_port_range():
     start_port = int(input("Starting port: "))
     end_port = int(input("Ending port: "))
     port_range = (start_port, (end_port + 1))
     return port_range
 
+## Function that performs the Port Scan
 def port_scan(remote_server_ip, full_scan=False):
     port_range = get_port_range()
     print (banner(remote_server_ip))
@@ -70,6 +73,29 @@ def port_scan(remote_server_ip, full_scan=False):
         print ("Couldn't connect to server!")
         sys.exit()
 
+## Function to run the program, and check if any arguments were passed
+def run_program():
+    if args.all == True:
+        if args.ip != None:
+            remote_server_ip = args.ip
+            time_1 = time_spent('start')
+            print (port_scan(remote_server_ip, args.all))
+        else:
+            remote_server_ip = get_host()
+            time_1 = time_spent('start')
+            print (port_scan(remote_server_ip, args.all))
+    else:
+        if args.ip != None:
+            remote_server_ip = args.ip
+            time_1 = time_spent('start')
+            print (port_scan(remote_server_ip))
+        else:
+            remote_server_ip = get_host()
+            time_1 = time_spent('start')
+            print (port_scan(remote_server_ip))
+    return time_1
+
+
 ## Parse any arguments
 parser = argparse.ArgumentParser(description="Set optional flags for PortScanner")
 parser.add_argument('-a', '--all', action='store_true', help="Display all ports. Closed, and Open")
@@ -80,25 +106,5 @@ args = parser.parse_args()
 subprocess.call('clear', shell=True)
 
 # Start the program
-
-if args.all == True:
-    if args.ip != None:
-        remote_server_ip = args.ip
-        time_1 = time_spent('start')
-        print (port_scan(remote_server_ip, args.all))
-    else:
-        remote_server_ip = get_host()
-        time_1 = time_spent('start')
-        print (port_scan(remote_server_ip, args.all))
-else:
-    if args.ip != None:
-        remote_server_ip = args.ip
-        time_1 = time_spent('start')
-        print (port_scan(remote_server_ip))
-    else:
-        remote_server_ip = get_host()
-        time_1 = time_spent('start')
-        print (port_scan(remote_server_ip))
-
-
+time_1 = run_program()
 print ("Time spent: ", time_spent('stop', time_1))
